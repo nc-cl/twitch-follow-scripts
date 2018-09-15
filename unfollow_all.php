@@ -1,7 +1,7 @@
 <?php
 
 if (!isset($argv[3])) {
-    echo "Insufficient arguments";
+    echo "Insufficient arguments\n";
     return;
 }
 
