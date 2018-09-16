@@ -6,18 +6,15 @@ if (!isset($argv[4])) {
 }
 
 $target_user_id = $argv[1];
-$client_user_id = $argv[2];
+$user_id = $argv[2];
 $client_id = $argv[3];
 $oauth_code = $argv[4];
 
 $ch = curl_init();
 
 
-const REQUEST_MAX_FOLLOWS = 100;
-
-// get followed users by the target user
+// get users followed by the target user
 curl_setopt_array($ch, [
-    CURLOPT_URL => "https://api.twitch.tv/kraken/users/${target_user_id}/follows/channels?direction=asc&limit=" . REQUEST_MAX_FOLLOWS,
     CURLOPT_HTTPHEADER => [
         "Accept: application/vnd.twitchtv.v5+json",
         "Client-ID: ${client_id}"
@@ -25,12 +22,22 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true
 ]);
 
-$follows = json_decode(curl_exec($ch), true)["follows"];
+$url = "https://api.twitch.tv/kraken/users/${target_user_id}/follows/channels"
+    . "?direction=asc"
+    . "&limit=100";
+$offset = 0;
 $followed_ids = [];
 
-foreach ($follows as $follow) {
-    $followed_ids[] = $follow["channel"]["_id"];
-}
+do {
+    curl_setopt($ch, CURLOPT_URL, "${url}&offset=${offset}");
+    $follow_data = json_decode(curl_exec($ch), true);
+
+    foreach ($follow_data["follows"] as $follow) {
+        $followed_ids[] = $follow["channel"]["_id"];
+    }
+
+    $offset += count($follow_data["follows"]);
+} while ($offset < $follow_data["_total"]);
 
 curl_reset($ch);
 
@@ -46,7 +53,7 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true
 ]);
 
-$follow_url = "https://api.twitch.tv/kraken/users/${client_user_id}/follows/channels/";
+$follow_url = "https://api.twitch.tv/kraken/users/${user_id}/follows/channels/";
 $follow_responses = [];
 
 foreach ($followed_ids as $id) {

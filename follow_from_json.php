@@ -6,7 +6,7 @@ if (!isset($argv[4])) {
 }
 
 $fname = $argv[1];
-$client_user_id = $argv[2];
+$user_id = $argv[2];
 $client_id = $argv[3];
 $oauth_code = $argv[4];
 
@@ -17,7 +17,7 @@ if (!$handle) {
     return;
 }
 
-$follows = json_decode(fread($handle, filesize($fname)), true)["follows"];
+$follows = json_decode(fread($handle, filesize($fname)), true);
 fclose($handle);
 $followed_ids = [];
 
@@ -37,7 +37,7 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true
 ]);
 
-$follow_url = "https://api.twitch.tv/kraken/users/${client_user_id}/follows/channels/";
+$follow_url = "https://api.twitch.tv/kraken/users/${user_id}/follows/channels/";
 $follow_responses = [];
 
 foreach ($followed_ids as $id) {

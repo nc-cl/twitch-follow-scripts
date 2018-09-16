@@ -5,18 +5,16 @@ if (!isset($argv[3])) {
     return;
 }
 
-$client_user_id = $argv[1];
+$user_id = $argv[1];
 $client_id = $argv[2];
 $oauth_code = $argv[3];
 
 $ch = curl_init();
 
 
-const REQUEST_MAX_FOLLOWS = 100;
-
 // get all followed users
 curl_setopt_array($ch, [
-    CURLOPT_URL => "https://api.twitch.tv/kraken/users/${client_user_id}/follows/channels?limit=" . REQUEST_MAX_FOLLOWS,
+    CURLOPT_URL => "https://api.twitch.tv/kraken/users/${user_id}/follows/channels?limit=100",
     CURLOPT_HTTPHEADER => [
         "Accept: application/vnd.twitchtv.v5+json",
         "Client-ID: ${client_id}"
@@ -45,7 +43,7 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true
 ]);
 
-$unfollow_url = "https://api.twitch.tv/kraken/users/${client_user_id}/follows/channels/";
+$unfollow_url = "https://api.twitch.tv/kraken/users/${user_id}/follows/channels/";
 $unfollow_responses = [];
 
 foreach ($followed_ids as $id) {
